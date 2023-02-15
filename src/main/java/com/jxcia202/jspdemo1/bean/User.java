@@ -1,5 +1,8 @@
 package com.jxcia202.jspdemo1.bean;
 
+import com.jxcia202.jspdemo1.bean.users.Reader;
+import com.jxcia202.jspdemo1.bean.users.UserLevel;
+
 import java.util.Date;
 
 public abstract class User {
@@ -75,4 +78,5 @@ public abstract class User {
         return registerTime;
     }
 
+    abstract public UserLevel getLevel();
 }
