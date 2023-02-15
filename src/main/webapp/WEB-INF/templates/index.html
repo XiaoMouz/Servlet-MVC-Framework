@@ -5,5 +5,10 @@
 
     <body>
         <h1>Test success, index is passed</h1>
+        {% if user != null %}
+            Hello,{{user.getUsername()}}
+        {% else %}
+            <a href="">login</a> or <a href="">register</a>
+        {% endif %}
     </body>
 </html>
