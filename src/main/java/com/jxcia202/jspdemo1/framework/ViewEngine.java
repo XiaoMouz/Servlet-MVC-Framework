@@ -14,8 +14,7 @@ public class ViewEngine {
     public ViewEngine(ServletContext servletContext) {
         Servlet5Loader loader = new Servlet5Loader(servletContext);
         loader.setCharset("UTF-8");
-        loader.setPrefix("/WEB-INF/" +
-                "");
+        loader.setPrefix("/WEB-INF/templates");
         loader.setSuffix("");
         this.engine = new PebbleEngine.Builder().autoEscaping(true).cacheActive(false) // no cache for dev
                 .loader(loader).build();
