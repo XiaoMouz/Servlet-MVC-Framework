@@ -7,8 +7,8 @@ import java.util.Date;
 public class Reader extends User {
     final UserLevel level = UserLevel.READER;
 
-    public Reader(int id, String username, String email, String token, String registerIp, String lastLoginIp, Date lastLoginTime, Date registerTime) {
-        super(id, username, email, token, registerIp, lastLoginIp, lastLoginTime, registerTime);
+    public Reader(int id, String username, String password, String email, String token, String registerIp, String lastLoginIp, Date lastLoginTime, Date registerTime) {
+        super(id, username, password, email, token, registerIp, lastLoginIp, lastLoginTime, registerTime);
     }
 
     public UserLevel getLevel() {
