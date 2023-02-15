@@ -10,6 +10,6 @@ public class IndexController {
     public ModelAndView index(HttpSession session) {
         // todo: "user login requesting logic"
         User user = (User) session.getAttribute("user");
-        return new ModelAndView("templates/index.html", "user", user);
+        return new ModelAndView("/index.html", "user", user);
     }
 }
