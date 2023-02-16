@@ -7,7 +7,7 @@
             e.preventDefault();
             var data = {
                 username: $('#username').val(),
-                password: $('#password').val()
+                password: md5($('#password').val())
             };
             $.ajax({
                 type: 'POST',

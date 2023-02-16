@@ -110,16 +110,13 @@ public class UserController {
             PrintWriter pw = response.getWriter();
             pw.write("{\"error\":\" 403: Bean is null\"}");
             pw.flush();
-            System.out.println("OK-113");
         }
-        System.out.println("OK-114");
         User user = userDatabase.get(bean.username);
         if (user != null) {
             response.setContentType("application/json");
             PrintWriter pw = response.getWriter();
             pw.write("{\"error\":\"Username already exists\"}");
             pw.flush();
-            System.out.println("OK-121");
             return null;
         }
         // 将password使用md5二次加密作为token
@@ -128,9 +125,9 @@ public class UserController {
         String remoteAddr = request.getRemoteAddr();
         user = new Reader(-1, bean.username, bean.password, bean.email, token, remoteAddr, remoteAddr, new Date(), new Date());
         userDatabase.put(user.getUsername(), user);
-        System.out.println("OK-130");
         try{
             if(insertNewUser(user)) {
+                session.setAttribute("user", user);
                 response.setContentType("application/json");
                 PrintWriter pw = response.getWriter();
                 pw.write("{\"result\":true}");
@@ -142,7 +139,6 @@ public class UserController {
             pw.write("{\"error\":\""+e.toString()+"\"}");
             pw.flush();
         }
-        System.out.println("OK-144");
         return null;
     }
 
@@ -153,7 +149,7 @@ public class UserController {
     public ModelAndView profile(HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            return new ModelAndView("redirect:/signin");
+            return new ModelAndView("redirect:./signin");
         }
         return new ModelAndView("/profile.html", "user", user);
     }

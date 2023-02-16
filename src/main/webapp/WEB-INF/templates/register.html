@@ -9,11 +9,11 @@
             if ($('#username').val() == '' || $('#email').val() == '' || $('#password').val() == '') {
                 $('#error').text('请填写完整信息');
                 return;
-            }
-            var data = {
+            };
+            let data = {
                 username: $('#username').val(),
                 email: $('#email').val(),
-                password: $('#password').val(md5($('#password').val()))
+                password: md5($('#password').val())
             };
             $.ajax({
                 type: 'POST',
