@@ -1,0 +1,60 @@
+{% extends "../_base.html" %}
+
+{% block main %}
+<script>
+    $(function () {
+        $('#resetForm').submit(function (e) {
+            e.preventDefault();
+            if ($('#code').val() == '' || $('#password').val() == '' || $('#cpassword').val() == '') {
+                $('#error').text('Please entry all information')
+                return;
+            };
+            if($('#password').val() != $('#cpassword').val()){
+                $('#error').text('Password not match')
+                return;
+            }
+            if ($('#password').val().length < 6 || $('#password').val().length > 16) {
+                $('#error').text('Password length should be 6-16');
+                return;
+            };
+            var data = {
+                trackID: $('#code').val(),
+                password: md5($('#password').val())
+            };
+            $.ajax({
+                type: 'POST',
+                url: '#',
+                data: JSON.stringify(data),
+                success: function (resp) {
+                    if (resp.error) {
+                        $('#error').text(resp.error);
+                    } else {
+                        location.assign('./login');
+                    }
+                },
+                contentType: 'application/json',
+                dataType: 'json'
+            });
+        });
+    });
+</script>
+
+<form id="resetForm">
+    <div class="form-group">
+        <p id="error" class="text-danger"></p>
+    </div>
+    <div class="form-group">
+        <label>Verify code</label>
+        <input id="code" class="form-control" placeholder="Verify code">
+    </div>
+    <div class="form-group">
+        <label>New Password</label>
+        <input id="password" type="password" class="form-control" placeholder="New Password">
+    </div>
+    <div class="form-group">
+        <label>Confirm Password</label>
+        <input id="cpassword" type="password" class="form-control" placeholder="Confirm Password">
+    </div>
+    <button type="submit" class="btn btn-outline-primary">Done</button>
+</form>
+{% endblock %}

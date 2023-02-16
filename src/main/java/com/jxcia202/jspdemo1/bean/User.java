@@ -17,7 +17,7 @@ public abstract class User {
     private Date registerTime;
     private String avatarLink;
 
-    public User(int id, String username, String password, String email, String token, String registerIp, String lastLoginIp, Date lastLoginTime, Date registerTime) {
+    public User(int id, String username, String password, String  email, String token, String registerIp, String lastLoginIp, Date lastLoginTime, Date registerTime) {
         this.id = id;
         this.username = username;
         this.password = password;

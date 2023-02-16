@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class SinglePost {
     private int postid;
+    private String title;
     private String content;
     private Date releaseDate;
     private Date updateDate;
@@ -16,6 +17,14 @@ public class SinglePost {
 
     public void setPostid(int postid) {
         this.postid = postid;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getContent() {

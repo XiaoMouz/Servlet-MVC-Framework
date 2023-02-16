@@ -21,7 +21,7 @@
                     if (resp.error) {
                         $('#error').text(resp.error);
                     } else {
-                        location.assign('../');
+                        location.assign('./');
                     }
                 },
                 contentType: 'application/json',
@@ -45,6 +45,6 @@
     </div>
     <button type="submit" class="btn btn-outline-primary">Login</button> or <a type="button" href="./register" class="btn btn-outline-secondary">Register</a>
     <br><br>
-    Forget password?<a href="#">Reset password</a>
+    Forget password?<a href="./reset">Reset password</a>
 </form>
 {% endblock %}

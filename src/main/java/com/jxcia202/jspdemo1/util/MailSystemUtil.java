@@ -1,9 +1,6 @@
 package com.jxcia202.jspdemo1.util;
 
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
+import jakarta.mail.*;
 import jakarta.mail.internet.*;
 
 import java.io.InputStream;
@@ -14,14 +11,14 @@ public class MailSystemUtil {
     private static String host;
     private static String username;
     private static String password;
-
+    private static Properties properties = null;
     static{
         try{
-            Properties properties = new Properties();
+            properties = System.getProperties();
             InputStream input = ConnectionUtil.class.getClassLoader().getResourceAsStream("mail.properties");
             properties.load(input);
             host = properties.getProperty("host");
-            username = properties.getProperty("user");
+            username = properties.getProperty("username");
             password = properties.getProperty("password");
         }catch(Exception e){
             e.printStackTrace();
@@ -36,24 +33,25 @@ public class MailSystemUtil {
      * @param content 内容
      */
     public static void sendMail(String to, String subject, String content) {
-        // 属性
-        Properties properties = System.getProperties();
         // 设置邮件服务器
         properties.setProperty("mail.smtp.host", host); // 邮件服务器
         properties.put("mail.smtp.auth", "true"); // 验证要求
-        properties.setProperty("mail.user", username); // 邮件验证用户名
-        properties.setProperty("mail.password", password); // 邮件验证密码
 
 
         // 获取默认session对象
-        Session session = Session.getDefaultInstance(properties);
+        Session session =  Session.getDefaultInstance(properties,new Authenticator(){
+            public PasswordAuthentication getPasswordAuthentication()
+            {
+                return new PasswordAuthentication(username,password); //发件人邮件用户名、授权码
+            }
+        });
 
         try{
             // 创建默认的 MimeMessage 对象
             MimeMessage message = new MimeMessage(session);
 
             // Set From: 头部头字段
-            message.setFrom(new InternetAddress(username));
+            message.setFrom(username);
 
             // Set To: 头部头字段
             message.addRecipient(Message.RecipientType.TO,

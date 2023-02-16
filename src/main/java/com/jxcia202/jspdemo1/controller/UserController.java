@@ -10,6 +10,7 @@ import com.jxcia202.jspdemo1.bean.User;
 import com.jxcia202.jspdemo1.bean.account.LoginBean;
 import com.jxcia202.jspdemo1.bean.account.RegisterBean;
 import com.jxcia202.jspdemo1.bean.account.ResetBean;
+import com.jxcia202.jspdemo1.bean.account.VerifyBean;
 import com.jxcia202.jspdemo1.bean.users.Administrator;
 import com.jxcia202.jspdemo1.bean.users.Editor;
 import com.jxcia202.jspdemo1.bean.users.Maintainer;
@@ -75,12 +76,32 @@ public class UserController {
         return statement.executeUpdate() > 0;
     }
 
-    private void updateUserLoginTimeAndIp(User user,String ip) throws SQLException{
+    private void updateUserLoginTimeAndIp(User user) throws SQLException{
         String sql = "update user set lastLoginIp = ?,lastLoginTime = ? where username = ?";
         PreparedStatement statement = remote.prepareStatement(sql);
-        statement.setString(1,ip);
+        statement.setString(1,user.getLastLoginIp());
         statement.setTimestamp(2,new java.sql.Timestamp(user.getLastLoginTime().getTime()));
         statement.setString(3,user.getUsername());
+    }
+
+    private void updateUserPassword(User user) throws SQLException{
+        String sql = "update user set password = ? where username = ?";
+        PreparedStatement statement = remote.prepareStatement(sql);
+        statement.setString(1,user.getPassword());
+        statement.setString(2,user.getUsername());
+        statement.executeUpdate();
+    }
+
+    private ModelAndView resetSent(ResetBean bean, HttpServletResponse response, String trackID, User user) throws IOException {
+        bean.trackID = trackID;
+        bean.requestDate = new Date();
+        bean.user = user;
+        MailSystemUtil.sendMail(user.getEmail(), "Recovery Account", "Your verify Code is " + trackID + ",Please enter it in 10 minutes");
+        response.setContentType("application/json");
+        PrintWriter pw = response.getWriter();
+        pw.write("{\"result\":true}");
+        pw.flush();
+        return null;
     }
 
     @GetMapping("/login")
@@ -99,9 +120,10 @@ public class UserController {
             return null;
         }
         session.setAttribute("user", user);
-        String ip = request.getRemoteAddr();
+        user.setLastLoginIp(request.getRemoteAddr());
+        user.setLastLoginTime(new Date());
         try{
-            updateUserLoginTimeAndIp(user,ip);
+            updateUserLoginTimeAndIp(user);
         }catch (Exception e){
             logger.error(user.getUsername()+"update ip failed");
         }
@@ -195,7 +217,7 @@ public class UserController {
     @PostMapping("/reset")
     public ModelAndView reset(ResetBean bean, HttpServletResponse response) throws IOException {
         Random r = new Random();
-        String trackID = String.valueOf(r.nextInt(1000000000, 999999999));
+        String trackID = String.valueOf(r.nextInt(100000000));
         resetBean = bean;
         if (!bean.isEmail()) {
             User user = userDatabase.get(bean.input);
@@ -206,9 +228,7 @@ public class UserController {
                 pw.flush();
                 return null;
             }
-            bean.setTrackID(trackID);
-            bean.setRequestDate(new Date());
-            MailSystemUtil.sendMail(user.getEmail(), "Recovery Account", "Your verify Code is " + trackID + ",Please enter it in 10 minutes");
+            return resetSent(bean, response, trackID, user);
         }
         User user = null;
         for (Map.Entry<String, User> entry : userDatabase.entrySet()) {
@@ -224,10 +244,58 @@ public class UserController {
             pw.flush();
             return null;
         }
-        bean.setTrackID(trackID);
-        bean.setRequestDate(new Date());
-        MailSystemUtil.sendMail(user.getEmail(), "Recovery Account", "Your verify Code is " + trackID + ",Please enter it in 10 minutes");
-        return null;
+        return resetSent(bean, response, trackID, user);
+    }
+
+    @GetMapping("/verify")
+    public ModelAndView verify() {
+        if(resetBean == null){
+            return new ModelAndView("redirect:./reset");
+        }
+        return new ModelAndView("/user/verify.html");
+    }
+
+    @PostMapping("/verify")
+    public ModelAndView verify(VerifyBean bean, HttpServletResponse response) throws IOException {
+        if (resetBean == null) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\"Please request reset first\"}");
+            pw.flush();
+            return null;
+        }
+        if (!bean.trackID.equals(resetBean.trackID)) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\"Verify code is incorrect\"}");
+            pw.flush();
+            return null;
+        }
+        if (new Date().getTime() - resetBean.requestDate.getTime() > 600000) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\"Verify code is expired\"}");
+            pw.flush();
+            return null;
+        }
+        User user = userDatabase.get(resetBean.input);
+        user.setPassword(bean.password);
+        user.setToken(EncryptionUtil.getMD5Result(bean.password));
+        userDatabase.put(user.getUsername(), user);
+        try {
+            updateUserPassword(user);
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"result\":true}");
+            pw.flush();
+            return null;
+        }catch (SQLException e) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\""+e.toString()+"\"}");
+            pw.flush();
+            return null;
+        }
     }
 
     @GetMapping("/user/profile")
