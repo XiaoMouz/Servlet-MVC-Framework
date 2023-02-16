@@ -14,7 +14,7 @@
   {% if user != null %}
     {% if user.getLevel() != UserLevel.READER %}
       <nav class="my-2 mr-md-3">
-        <a class="p-2 text-dark" target="_blank" href="./setting">Settings</a>
+        <a class="p-2 text-dark" target="_blank" href="./general">Settings</a>
       </nav>
     {% endif %}
   {% endif %}
@@ -31,7 +31,7 @@
 
 <div class="container" style="max-width: 960px">
   <div class="row">
-    <div class="col-12 col-md">
+    <div class="col-lg-12 col-md">
       {% block main %}
       {% endblock %}
     </div>

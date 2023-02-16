@@ -1,9 +1,10 @@
 {% extends "../_base.html" %}
 
 {% block main %}
-    <h1>Site Setting</h1>
-    <div class="col-4 col-md">
-        <ul class="nav nav-pills flex-column">
+<h1>Site Setting</h1>
+<div class="row">
+    <div class="col-12 mt-4">
+        <ul class="nav nav-pills">
             <li class="nav-item">
                 <a class="nav-link" href="./general">General</a>
             </li>
@@ -11,18 +12,21 @@
                 <a class="nav-link" href="./users">Users manager</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="./posts">posts</a>
+                <a class="nav-link" href="./posts">Posts</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="./categories">categories</a>
+                <a class="nav-link" href="./categories">Categories</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="./tags">tags</a>
+                <a class="nav-link" href="./tags">Tags</a>
             </li>
         </ul>
     </div>
-    <div class="col-8 col-md">
-        {% block content %}
-        {% endblock %}
+    <div class="col-12">
+        <div class="row">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
+</div>
 {% endblock %}

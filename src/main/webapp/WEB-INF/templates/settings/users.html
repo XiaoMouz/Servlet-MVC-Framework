@@ -1,1 +1,56 @@
-{}
+{% extends "./_settingbase.html" %}
+
+{% block content %}
+<script xmlns="http://www.w3.org/1999/html">
+    function requestApi(username,action,level) {
+        var data = {
+            username: username,
+            action: action,
+            userLevel: level
+        };
+        $.ajax({
+            type: 'POST',
+            url: '#',
+            data: JSON.stringify(data),
+            success: function (resp) {
+                if (resp.error) {
+                    $('#error').text(resp.error);
+                } else {
+                    location.assign('./users');
+                }
+            },
+            contentType: 'application/json',
+            dataType: 'json'
+        });
+}
+</script>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if users != null %}
+                {% for i in userLists %}
+                    <tr>
+                            <td>{{i}}</td>
+                            <td>{{users[i].getEmail()}}</td>
+                            <td>
+                                <select class="level-{{i}}">
+                                    <option {% if (users[i].getLevel().toString() == "ADMINISTRATOR") %} selected {% endif %}>ADMINISTRATOR</option>
+                                    <option {% if (users[i].getLevel().toString() == "EDITOR") %} selected {% endif %}>EDITOR</option>
+                                    <option {% if (users[i].getLevel().toString() == "MAINTATINER") %} selected {% endif %}>MAINTAINER</option>
+                                    <option {% if (users[i].getLevel().toString() == "READER") %} selected {% endif %}>READER</option>
+                                </select>
+                            </td>
+                            <td><button class="btn btn-primary" onclick="requestApi('{{i}}','updateRole', $('.level-{{i}}').val())">Set Role</button>&nbsp;&nbsp;<button class="btn btn-danger" onclick="requestApi('{{i}}','delete', $('level-{{i}}').val())">Delete</button></td>
+                    </tr>
+                    {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+{% endblock %}

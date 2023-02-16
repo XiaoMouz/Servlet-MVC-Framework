@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.jxcia202.jspdemo1.controller.SettingController;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -34,8 +35,7 @@ public class DispatcherServlet extends HttpServlet {
 
     private Map<String, PostDispatcher> postMappings = new HashMap<>();
 
-    // TODO: 可指定package并自动扫描:
-    private List<Class<?>> controllers = List.of(IndexController.class, UserController.class);
+    private List<Class<?>> controllers = List.of(IndexController.class, UserController.class, SettingController.class);
 
     private ViewEngine viewEngine;
 

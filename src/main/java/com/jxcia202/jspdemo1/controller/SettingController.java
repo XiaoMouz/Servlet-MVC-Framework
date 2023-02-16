@@ -2,11 +2,14 @@ package com.jxcia202.jspdemo1.controller;
 
 import com.jxcia202.jspdemo1.bean.User;
 import com.jxcia202.jspdemo1.bean.settings.SettingBean;
+import com.jxcia202.jspdemo1.bean.settings.UserBean;
 import com.jxcia202.jspdemo1.bean.users.*;
 import com.jxcia202.jspdemo1.framework.GetMapping;
 import com.jxcia202.jspdemo1.framework.ModelAndView;
 import com.jxcia202.jspdemo1.framework.PostMapping;
 import com.jxcia202.jspdemo1.util.ConnectionUtil;
+import com.jxcia202.jspdemo1.util.JsonUtil;
+import com.jxcia202.jspdemo1.util.JsonType;
 import com.jxcia202.jspdemo1.util.SiteSetUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -16,10 +19,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SettingController {
@@ -72,7 +75,7 @@ public class SettingController {
     @GetMapping("/general")
     public ModelAndView general(HttpSession session){
         if(session.getAttribute("user") == null)
-            return new ModelAndView("/login.html");
+            return new ModelAndView("redirect:./login");
         session.setAttribute("settings",settings);
         return new ModelAndView("/settings/general.html");
     }
@@ -80,14 +83,55 @@ public class SettingController {
     @PostMapping("/general")
     public ModelAndView general(SettingBean bean, HttpServletResponse response, HttpSession session) throws IOException {
         if(session.getAttribute("user") == null)
-            return new ModelAndView("/login.html");
+            return new ModelAndView("redirect:./login");
         try {
             if(updateSetting(bean.key, bean.value)){
-
+                response.sendRedirect("./general");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return null;
     }
+
+    @GetMapping("/users")
+    public ModelAndView users(HttpSession session){
+        if(session.getAttribute("user")==null)
+            return new ModelAndView("redirect:./login");
+        if(((User)session.getAttribute("user")).getLevel() != UserLevel.ADMINISTRATOR)
+            return new ModelAndView("redirect:./");
+        List<String> userLists = new ArrayList<>();
+        users.forEach((k,v)->{
+            userLists.add(k);
+        });
+        session.setAttribute("userLists",userLists);
+        session.setAttribute("users",users);
+        return new ModelAndView("/settings/users.html", new HashMap<>(){
+            {
+                put("userLists",userLists);
+                put("users",users);
+            }
+        });
+    }
+
+    @PostMapping("/users")
+    public ModelAndView users(UserBean bean, HttpServletResponse response, HttpSession session) throws IOException {
+        if(session.getAttribute("user") == null)
+            return new ModelAndView("redirect:./login");
+        if(((User)session.getAttribute("user")).getLevel() != UserLevel.ADMINISTRATOR)
+            return new ModelAndView("redirect:./");
+        try {
+            logger.info(bean.toString());
+            if (bean.action.equals("delete"))
+                if (deleteUser(users.get(bean.username))) {
+                    JsonUtil.responseJson(response, JsonType.SUCCESS, "Delete success");
+                    return null;
+                }
+            if (upgradeUser(users.get(bean.username), UserLevel.valueOf(bean.userLevel)))
+                JsonUtil.responseJson(response, JsonType.SUCCESS, "Upgrade success");
+            return null;
+        } catch (SQLException e) {
+            JsonUtil.responseJson(response, JsonType.ERROR, "Failed in database");
+            return null;
+        }}
 }
