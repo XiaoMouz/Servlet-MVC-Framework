@@ -128,11 +128,6 @@ public class UserController {
             JsonResponseUtil.responseJson(response, JsonType.ERROR, "Invalid email address");
             return null;
         }
-        // 检查密码是否符合6-16位
-        if (bean.password.length() < 6 || bean.password.length() > 16) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Password must be 6-16 characters");
-            return null;
-        }
 
         User user = userDatabase.get(bean.username);
         if (user != null) {
