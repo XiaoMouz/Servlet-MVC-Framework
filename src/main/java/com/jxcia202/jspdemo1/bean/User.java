@@ -15,6 +15,7 @@ public abstract class User {
     private String lastLoginIp;
     private Date lastLoginTime;
     private Date registerTime;
+    private String avatarLink;
 
     public User(int id, String username, String password, String email, String token, String registerIp, String lastLoginIp, Date lastLoginTime, Date registerTime) {
         this.id = id;
@@ -86,6 +87,14 @@ public abstract class User {
 
     public Date getRegisterTime() {
         return registerTime;
+    }
+
+    public String getAvatarLink() {
+        return avatarLink;
+    }
+
+    public void setAvatarLink(String avatarLink) {
+        this.avatarLink = avatarLink;
     }
 
     abstract public UserLevel getLevel();

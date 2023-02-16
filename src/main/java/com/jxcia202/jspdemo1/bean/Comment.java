@@ -8,6 +8,7 @@ public class Comment {
     private String ip;
     private String email;
     private String content;
+    private String avatarLink;
 
     public String getName() {
         return name;
@@ -47,5 +48,13 @@ public class Comment {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getAvatarLink() {
+        return avatarLink;
+    }
+
+    public void setAvatarLink(String avatarLink) {
+        this.avatarLink = avatarLink;
     }
 }

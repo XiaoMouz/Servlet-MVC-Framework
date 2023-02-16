@@ -8,6 +8,7 @@ public class SinglePost {
     private Date releaseDate;
     private Date updateDate;
     private User author;
+    private String headImgLink;
 
     public int getPostid() {
         return postid;
@@ -47,5 +48,13 @@ public class SinglePost {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public String getHeadImgLink() {
+        return headImgLink;
+    }
+
+    public void setHeadImgLink(String headImgLink) {
+        this.headImgLink = headImgLink;
     }
 }
