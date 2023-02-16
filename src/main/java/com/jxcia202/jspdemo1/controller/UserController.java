@@ -23,22 +23,25 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 public class UserController {
     Connection remote = ConnectionFactory.getConnection();
+    private  ArrayList<User> getDBUsers() throws SQLException {
+        ArrayList<User> onlineUsers = new ArrayList<User>();
+        PreparedStatement statement = remote.prepareStatement("select * from user");
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()){
+            switch(resultSet.getString("userlevel")){
+                case "ADMINISTRATOR": onlineUsers.add(new Administrator(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
+                case "EDITOR": onlineUsers.add(new Editor(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
+                case "MAINTAINER": onlineUsers.add(new Maintainer(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
+                case "READER": onlineUsers.add(new Reader(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
+                default: break;
+            }
+        }
+        return onlineUsers;
+    }
     private Map<String, User> userDatabase = new HashMap<>() {
         {
             try{
-                ArrayList<User> onlineUsers = new ArrayList<User>();
-                PreparedStatement statement = remote.prepareStatement("select * from user");
-                ResultSet resultSet = statement.executeQuery();
-                while(resultSet.next()){
-                        switch(resultSet.getString("userlevel")){
-                            case "ADMINISTRATOR": onlineUsers.add(new Administrator(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
-                            case "EDITOR": onlineUsers.add(new Editor(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
-                            case "MAINTAINER": onlineUsers.add(new Maintainer(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
-                            case "READER": onlineUsers.add(new Reader(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
-                            default: break;
-                        }
-                }
-                onlineUsers.forEach(user -> {put(user.getUsername(),user);});
+                getDBUsers().forEach(user -> {put(user.getUsername(),user);});
             }catch (Exception e){
                 List<User> offlineUsers = List.of(
                         new Administrator(1,"XiaoMouz","123000","gxiaomouz@gmail.com","114514","127.0.0.1","127.0.0.1",new Date(),new Date()),
