@@ -1,7 +1,6 @@
 package com.jxcia202.jspdemo1.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
@@ -11,9 +10,6 @@ import com.jxcia202.jspdemo1.bean.account.LoginBean;
 import com.jxcia202.jspdemo1.bean.account.RegisterBean;
 import com.jxcia202.jspdemo1.bean.account.ResetBean;
 import com.jxcia202.jspdemo1.bean.account.VerifyBean;
-import com.jxcia202.jspdemo1.bean.users.Administrator;
-import com.jxcia202.jspdemo1.bean.users.Editor;
-import com.jxcia202.jspdemo1.bean.users.Maintainer;
 import com.jxcia202.jspdemo1.bean.users.Reader;
 import com.jxcia202.jspdemo1.framework.GetMapping;
 import com.jxcia202.jspdemo1.framework.ModelAndView;
@@ -74,7 +70,7 @@ public class UserController {
         bean.requestDate = new Date();
         bean.user = user;
         MailSystemUtil.sendMail(user.getEmail(), "Recovery Account", "Your verify Code is " + trackID + ",Please enter it in 10 minutes");
-        JsonResponseUtil.responseJson(response, JsonType.SUCCESS, "Reset password email sent");
+        JsonUtil.responseJson(response, JsonType.SUCCESS, "Reset password email sent");
         return null;
     }
 
@@ -87,7 +83,7 @@ public class UserController {
     public ModelAndView login(LoginBean bean, HttpServletResponse response, HttpSession session, HttpServletRequest request) throws IOException {
         User user = userDatabase.get(bean.username);
         if (user == null || !user.getPassword().equals(bean.password)) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Username or password is incorrect");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Username or password is incorrect");
             return null;
         }
         session.setAttribute("user", user);
@@ -98,7 +94,7 @@ public class UserController {
         }catch (Exception e){
             logger.error(user.getUsername()+"update ip failed");
         }
-        JsonResponseUtil.responseJson(response, JsonType.SUCCESS, "Login success");
+        JsonUtil.responseJson(response, JsonType.SUCCESS, "Login success");
         return null;
     }
 
@@ -116,22 +112,22 @@ public class UserController {
     @PostMapping("/register")
     public ModelAndView register(RegisterBean bean, HttpServletResponse response, HttpSession session, HttpServletRequest request) throws IOException {
         if (bean == null || bean.username == null || bean.password == null || bean.email == null) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Invalid request");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Invalid request");
         }
         // 检查用户名是否为纯字母数字
         if (!bean.username.matches("[a-zA-Z0-9]+")) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Username must be alphanumeric");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Username must be alphanumeric");
             return null;
         }
         // 检查邮箱格式是否正确
         if (!bean.email.matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Invalid email address");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Invalid email address");
             return null;
         }
 
         User user = userDatabase.get(bean.username);
         if (user != null) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Username already exists");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Username already exists");
             return null;
         }
         // 将password使用md5二次加密作为token
@@ -143,10 +139,10 @@ public class UserController {
         try{
             if(insertNewUser(user)) {
                 session.setAttribute("user", user);
-                JsonResponseUtil.responseJson(response, JsonType.SUCCESS, "Register success");
+                JsonUtil.responseJson(response, JsonType.SUCCESS, "Register success");
             }
         } catch (SQLException e) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Register failed, Server have problem");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Register failed, Server have problem");
         }
         return null;
     }
@@ -164,7 +160,7 @@ public class UserController {
         if (!bean.isEmail()) {
             User user = userDatabase.get(bean.input);
             if (user == null) {
-                JsonResponseUtil.responseJson(response, JsonType.ERROR, "Username does not exist");
+                JsonUtil.responseJson(response, JsonType.ERROR, "Username does not exist");
                 return null;
             }
             return resetSent(bean, response, trackID, user);
@@ -177,7 +173,7 @@ public class UserController {
             }
         }
         if (user == null) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Email does not exist");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Email does not exist");
             return null;
         }
         return resetSent(bean, response, trackID, user);
@@ -194,15 +190,15 @@ public class UserController {
     @PostMapping("/verify")
     public ModelAndView verify(VerifyBean bean, HttpServletResponse response) throws IOException {
         if (resetBean == null) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Invalid request");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Invalid request");
             return null;
         }
         if (!bean.trackID.equals(resetBean.trackID)) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Invalid verify code");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Invalid verify code");
             return null;
         }
         if (new Date().getTime() - resetBean.requestDate.getTime() > 600000) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Verify time expired");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Verify time expired");
             return null;
         }
         User user = userDatabase.get(resetBean.input);
@@ -211,10 +207,10 @@ public class UserController {
         userDatabase.put(user.getUsername(), user);
         try {
             updateUserPassword(user);
-            JsonResponseUtil.responseJson(response, JsonType.SUCCESS, "Reset password success");
+            JsonUtil.responseJson(response, JsonType.SUCCESS, "Reset password success");
             return null;
         }catch (SQLException e) {
-            JsonResponseUtil.responseJson(response, JsonType.ERROR, "Reset password failed, Server have problem");
+            JsonUtil.responseJson(response, JsonType.ERROR, "Reset password failed, Server have problem");
             return null;
         }
     }
