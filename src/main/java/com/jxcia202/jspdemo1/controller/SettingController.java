@@ -1,16 +1,19 @@
 package com.jxcia202.jspdemo1.controller;
 
 import com.jxcia202.jspdemo1.bean.User;
+import com.jxcia202.jspdemo1.bean.settings.SettingBean;
 import com.jxcia202.jspdemo1.bean.users.*;
 import com.jxcia202.jspdemo1.framework.GetMapping;
 import com.jxcia202.jspdemo1.framework.ModelAndView;
 import com.jxcia202.jspdemo1.framework.PostMapping;
 import com.jxcia202.jspdemo1.util.ConnectionUtil;
 import com.jxcia202.jspdemo1.util.SiteSetUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -72,5 +75,19 @@ public class SettingController {
             return new ModelAndView("/login.html");
         session.setAttribute("settings",settings);
         return new ModelAndView("/settings/general.html");
+    }
+
+    @PostMapping("/general")
+    public ModelAndView general(SettingBean bean, HttpServletResponse response, HttpSession session) throws IOException {
+        if(session.getAttribute("user") == null)
+            return new ModelAndView("/login.html");
+        try {
+            if(updateSetting(bean.key, bean.value)){
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 }
