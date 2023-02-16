@@ -60,12 +60,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ModelAndView doLogin(LoginBean bean, HttpServletResponse response, HttpSession session) throws IOException {
+    public ModelAndView login(LoginBean bean, HttpServletResponse response, HttpSession session) throws IOException {
         User user = userDatabase.get(bean.username);
         if (user == null || !user.getPassword().equals(bean.password)) {
             response.setContentType("application/json");
             PrintWriter pw = response.getWriter();
-            pw.write("{\"error\":\"Bad email or password\"}");
+            pw.write("{\"error\":\"Bad username or password\"}");
             pw.flush();
         } else {
             session.setAttribute("user", user);
@@ -80,7 +80,7 @@ public class UserController {
     @GetMapping("/logout")
     public ModelAndView logout(HttpSession session) {
         session.removeAttribute("user");
-        return new ModelAndView("redirect:/");
+        return new ModelAndView("redirect:./");
     }
 
     @GetMapping("/user/profile")
