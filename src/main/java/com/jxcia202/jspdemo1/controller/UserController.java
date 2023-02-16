@@ -19,10 +19,15 @@ import com.jxcia202.jspdemo1.framework.ModelAndView;
 import com.jxcia202.jspdemo1.framework.PostMapping;
 import com.jxcia202.jspdemo1.util.ConnectionUtil;
 import com.jxcia202.jspdemo1.util.EncryptionUtil;
+import com.jxcia202.jspdemo1.util.MailSystemUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class UserController {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     Connection remote = ConnectionUtil.getConnection();
     private  ArrayList<User> getDBUsers() throws SQLException {
         ArrayList<User> onlineUsers = new ArrayList<User>();
@@ -54,6 +59,7 @@ public class UserController {
         }
 
     };
+    private ResetBean resetBean = null;
 
     private boolean insertNewUser(User user) throws SQLException{
         String sql = "insert into user(username,password,email,token,registerIp,lastLoginIp,lastLoginTime,registerTime) values(?,?,?,?,?,?,?,?)";
@@ -64,9 +70,17 @@ public class UserController {
         statement.setString(4,user.getToken());
         statement.setString(5,user.getRegisterIp());
         statement.setString(6,user.getLastLoginIp());
-        statement.setDate(7,new java.sql.Date(user.getLastLoginTime().getTime()));
-        statement.setDate(8,new java.sql.Date(user.getRegisterTime().getTime()));
+        statement.setTimestamp(7,new java.sql.Timestamp(user.getLastLoginTime().getTime()));
+        statement.setTimestamp(8,new java.sql.Timestamp(user.getRegisterTime().getTime()));
         return statement.executeUpdate() > 0;
+    }
+
+    private void updateUserLoginTimeAndIp(User user,String ip) throws SQLException{
+        String sql = "update user set lastLoginIp = ?,lastLoginTime = ? where username = ?";
+        PreparedStatement statement = remote.prepareStatement(sql);
+        statement.setString(1,ip);
+        statement.setTimestamp(2,new java.sql.Timestamp(user.getLastLoginTime().getTime()));
+        statement.setString(3,user.getUsername());
     }
 
     @GetMapping("/login")
@@ -75,20 +89,26 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ModelAndView login(LoginBean bean, HttpServletResponse response, HttpSession session) throws IOException {
+    public ModelAndView login(LoginBean bean, HttpServletResponse response, HttpSession session, HttpServletRequest request) throws IOException {
         User user = userDatabase.get(bean.username);
         if (user == null || !user.getPassword().equals(bean.password)) {
             response.setContentType("application/json");
             PrintWriter pw = response.getWriter();
             pw.write("{\"error\":\"Bad username or password\"}");
             pw.flush();
-        } else {
-            session.setAttribute("user", user);
-            response.setContentType("application/json");
-            PrintWriter pw = response.getWriter();
-            pw.write("{\"result\":true}");
-            pw.flush();
+            return null;
         }
+        session.setAttribute("user", user);
+        String ip = request.getRemoteAddr();
+        try{
+            updateUserLoginTimeAndIp(user,ip);
+        }catch (Exception e){
+            logger.error(user.getUsername()+"update ip failed");
+        }
+        response.setContentType("application/json");
+        PrintWriter pw = response.getWriter();
+        pw.write("{\"result\":true}");
+        pw.flush();
         return null;
     }
 
@@ -167,8 +187,48 @@ public class UserController {
         return null;
     }
 
+    @GetMapping("/reset")
+    public ModelAndView reset() {
+        return new ModelAndView("/user/reset.html");
+    }
 
-
+    @PostMapping("/reset")
+    public ModelAndView reset(ResetBean bean, HttpServletResponse response) throws IOException {
+        Random r = new Random();
+        String trackID = String.valueOf(r.nextInt(1000000000, 999999999));
+        resetBean = bean;
+        if (!bean.isEmail()) {
+            User user = userDatabase.get(bean.input);
+            if (user == null) {
+                response.setContentType("application/json");
+                PrintWriter pw = response.getWriter();
+                pw.write("{\"error\":\"Username does not exist\"}");
+                pw.flush();
+                return null;
+            }
+            bean.setTrackID(trackID);
+            bean.setRequestDate(new Date());
+            MailSystemUtil.sendMail(user.getEmail(), "Recovery Account", "Your verify Code is " + trackID + ",Please enter it in 10 minutes");
+        }
+        User user = null;
+        for (Map.Entry<String, User> entry : userDatabase.entrySet()) {
+            if (entry.getValue().getEmail().equals(bean.input)) {
+                user = entry.getValue();
+                break;
+            }
+        }
+        if (user == null) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\"Email does not exist\"}");
+            pw.flush();
+            return null;
+        }
+        bean.setTrackID(trackID);
+        bean.setRequestDate(new Date());
+        MailSystemUtil.sendMail(user.getEmail(), "Recovery Account", "Your verify Code is " + trackID + ",Please enter it in 10 minutes");
+        return null;
+    }
 
     @GetMapping("/user/profile")
     public ModelAndView profile(HttpSession session) {
