@@ -2,14 +2,13 @@ package com.jxcia202.jspdemo1.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 import com.jxcia202.jspdemo1.bean.User;
 import com.jxcia202.jspdemo1.bean.account.LoginBean;
+import com.jxcia202.jspdemo1.bean.account.RegisterBean;
 import com.jxcia202.jspdemo1.bean.users.Administrator;
 import com.jxcia202.jspdemo1.bean.users.Editor;
 import com.jxcia202.jspdemo1.bean.users.Maintainer;
@@ -18,7 +17,9 @@ import com.jxcia202.jspdemo1.framework.GetMapping;
 import com.jxcia202.jspdemo1.framework.ModelAndView;
 import com.jxcia202.jspdemo1.framework.PostMapping;
 import com.jxcia202.jspdemo1.jdbc.ConnectionFactory;
+import com.jxcia202.jspdemo1.util.EncryptionUtil;
 import com.sun.tools.javac.Main;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 public class UserController {
@@ -54,6 +55,20 @@ public class UserController {
 
     };
 
+    private boolean insertNewUser(User user) throws SQLException{
+        String sql = "insert into user(username,password,email,token,registerIp,lastLoginIp,lastLoginTime,registerTime) values(?,?,?,?,?,?,?,?)";
+        PreparedStatement statement = remote.prepareStatement(sql);
+        statement.setString(1,user.getUsername());
+        statement.setString(2,user.getPassword());
+        statement.setString(3,user.getEmail());
+        statement.setString(4,user.getToken());
+        statement.setString(5,user.getRegisterIp());
+        statement.setString(6,user.getLastLoginIp());
+        statement.setDate(7,new java.sql.Date(user.getLastLoginTime().getTime()));
+        statement.setDate(8,new java.sql.Date(user.getRegisterTime().getTime()));
+        return statement.executeUpdate() > 0;
+    }
+
     @GetMapping("/login")
     public ModelAndView login() {
         return new ModelAndView("/login.html");
@@ -82,6 +97,57 @@ public class UserController {
         session.removeAttribute("user");
         return new ModelAndView("redirect:./");
     }
+
+    @GetMapping("/register")
+    public ModelAndView register(HttpSession session){
+        return new ModelAndView("/register.html");
+    }
+
+    @PostMapping("/register")
+    public ModelAndView register(RegisterBean bean, HttpServletResponse response, HttpSession session, HttpServletRequest request) throws IOException {
+        if (bean == null || bean.username == null || bean.password == null || bean.email == null) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\" 403: Bean is null\"}");
+            pw.flush();
+            System.out.println("OK-113");
+        }
+        System.out.println("OK-114");
+        User user = userDatabase.get(bean.username);
+        if (user != null) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\"Username already exists\"}");
+            pw.flush();
+            System.out.println("OK-121");
+            return null;
+        }
+        // 将password使用md5二次加密作为token
+        String token = EncryptionUtil.getMD5Result(bean.password);
+        // 获取客户端Ip地址
+        String remoteAddr = request.getRemoteAddr();
+        user = new Reader(-1, bean.username, bean.password, bean.email, token, remoteAddr, remoteAddr, new Date(), new Date());
+        userDatabase.put(user.getUsername(), user);
+        System.out.println("OK-130");
+        try{
+            if(insertNewUser(user)) {
+                response.setContentType("application/json");
+                PrintWriter pw = response.getWriter();
+                pw.write("{\"result\":true}");
+                pw.flush();
+            }
+        } catch (SQLException e) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\""+e.toString()+"\"}");
+            pw.flush();
+        }
+        System.out.println("OK-144");
+        return null;
+    }
+
+
+
 
     @GetMapping("/user/profile")
     public ModelAndView profile(HttpSession session) {
