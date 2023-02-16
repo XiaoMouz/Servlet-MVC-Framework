@@ -5,17 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Demo for us</title>
   <script src="./static/js/jquery.js"></script>
+  <script src="./static/js/blueimp-md5.js"></script>
   <link href="./static/css/bootstrap.css" rel="stylesheet">
 </head>
 <body style="font-size:16px">
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
   <h5 class="my-0 mr-md-auto font-weight-normal"><a href="./">Home</a></h5>
   <nav class="my-2 mr-md-3">
-    <a class="p-2 text-dark" target="_blank" href="#">Learn</a>
-    <a class="p-2 text-dark" target="_blank" href="#">Source</a>
+    <a class="p-2 text-dark" target="_blank" href="#">Settings</a>
   </nav>
   {% if user==null %}
   <a href="login" class="btn btn-outline-primary">Login</a>
+    &nbsp;&nbsp;&nbsp;
+  <a href="register" class="btn btn-outline-secondary">Register</a>
   {% else %}
   <span>Welcome, <a href="user/profile">{{ user.getUsername() }}</a></span>
   &nbsp;&nbsp;&nbsp;
@@ -36,8 +38,8 @@
       <div class="col-12 col-md">
         <h5>Copyright&copy;2023</h5>
         <p>
-          <a target="_blank" href="#">Learn</a> -
-          <a target="_blank" href="#">Download</a> -
+          <a target="_blank" href="#">About</a> -
+          <a target="_blank" href="#">Support</a> -
           <a target="_blank" href="https://github.com/xiaomouz">Github</a>
         </p>
       </div>
