@@ -1,13 +1,24 @@
-{% extends "_base.html" %}
+{% extends "../_base.html" %}
 
 {% block main %}
 <script>
     $(function () {
         $('#regForm').submit(function (e) {
             e.preventDefault()
-            // 提交项判空
             if ($('#username').val() == '' || $('#email').val() == '' || $('#password').val() == '') {
                 $('#error').text('请填写完整信息');
+                return;
+            };
+            if (!/^[a-zA-Z0-9]+$/.test($('#username').val())) {
+                $('#error').text('用户名只能包含字母和数字');
+                return;
+            };
+            if (!/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test($('#email').val())) {
+                $('#error').text('邮箱格式不正确');
+                return;
+            };
+            if ($('#password').val().length < 6 || $('#password').val().length > 16) {
+                $('#error').text('密码长度应为6-16位');
                 return;
             };
             let data = {
@@ -23,7 +34,7 @@
                     if (resp.error) {
                         $('#error').text(resp.error);
                     } else {
-                        location.assign('./');
+                        location.assign('../');
                     }
                 },
                 contentType: 'application/json',

@@ -1,10 +1,14 @@
-{% extends "_base.html" %}
+{% extends "../_base.html" %}
 
 {% block main %}
 <script>
     $(function () {
         $('#signinForm').submit(function (e) {
             e.preventDefault();
+            if ($('#username').val() == '' || $('#password').val() == '') {
+                $('#error').text('请填写完整信息');
+                return;
+            };
             var data = {
                 username: $('#username').val(),
                 password: md5($('#password').val())
@@ -17,7 +21,7 @@
                     if (resp.error) {
                         $('#error').text(resp.error);
                     } else {
-                        location.assign('./');
+                        location.assign('../');
                     }
                 },
                 contentType: 'application/json',

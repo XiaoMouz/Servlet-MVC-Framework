@@ -111,6 +111,31 @@ public class UserController {
             pw.write("{\"error\":\" 403: Bean is null\"}");
             pw.flush();
         }
+        // 检查用户名是否为纯字母数字
+        if (!bean.username.matches("[a-zA-Z0-9]+")) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\"Username must be alphanumeric\"}");
+            pw.flush();
+            return null;
+        }
+        // 检查邮箱格式是否正确
+        if (!bean.email.matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+")) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\"Email format is incorrect\"}");
+            pw.flush();
+            return null;
+        }
+        // 检查密码是否符合6-16位
+        if (bean.password.length() < 6 || bean.password.length() > 16) {
+            response.setContentType("application/json");
+            PrintWriter pw = response.getWriter();
+            pw.write("{\"error\":\"Password must be 6-16 characters\"}");
+            pw.flush();
+            return null;
+        }
+
         User user = userDatabase.get(bean.username);
         if (user != null) {
             response.setContentType("application/json");
