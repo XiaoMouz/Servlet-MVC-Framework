@@ -16,25 +16,6 @@
         <element id="directory" name="lib">
           <element id="library" level="project" name="Maven: com.mysql:mysql-connector-j:8.0.31" />
           <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.19.4" />
-          <element id="library" level="project" name="Maven: io.pebbletemplates:pebble:3.2.0" />
-          <element id="library" level="project" name="Maven: org.unbescape:unbescape:1.1.6.RELEASE" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.module:jackson-module-scala_3:2.14.2" />
-          <element id="library" level="project" name="Maven: org.scala-lang:scala3-library_3:3.2.0" />
-          <element id="library" level="project" name="Maven: org.scala-lang:scala-library:2.13.8" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.14.2" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.14.2" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.14.2" />
-          <element id="library" level="project" name="Maven: com.thoughtworks.paranamer:paranamer:2.8" />
-          <element id="library" level="project" name="Maven: org.apache.maven.plugins:maven-compiler-plugin:3.10.1" />
-          <element id="library" level="project" name="Maven: org.apache.maven.shared:maven-shared-utils:3.3.4" />
-          <element id="library" level="project" name="Maven: org.apache.maven.shared:maven-shared-incremental:1.1" />
-          <element id="library" level="project" name="Maven: org.codehaus.plexus:plexus-component-annotations:1.5.5" />
-          <element id="library" level="project" name="Maven: org.codehaus.plexus:plexus-java:1.1.1" />
-          <element id="library" level="project" name="Maven: org.codehaus.plexus:plexus-compiler-api:2.11.1" />
-          <element id="library" level="project" name="Maven: org.codehaus.plexus:plexus-compiler-manager:2.11.1" />
-          <element id="library" level="project" name="Maven: org.codehaus.plexus:plexus-compiler-javac:2.11.1" />
-          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:2.0.6" />
-          <element id="library" level="project" name="Maven: ch.qos.logback:logback-core:1.4.5" />
         </element>
       </element>
       <element id="directory" name="META-INF">
