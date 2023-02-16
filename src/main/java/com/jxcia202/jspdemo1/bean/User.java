@@ -98,4 +98,5 @@ public abstract class User {
     }
 
     abstract public UserLevel getLevel();
+    abstract public void setLevel(UserLevel level);
 }

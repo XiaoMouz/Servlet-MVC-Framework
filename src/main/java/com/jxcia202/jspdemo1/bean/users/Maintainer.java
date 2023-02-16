@@ -5,13 +5,19 @@ import com.jxcia202.jspdemo1.bean.User;
 import java.util.Date;
 
 public class Maintainer extends User {
-    final UserLevel level = UserLevel.MAINTAINER;
+    UserLevel level = UserLevel.MAINTAINER;
 
-    public Maintainer(int id, String username, String password, String email,  String token, String registerIp, String lastLoginIp, Date lastLoginTime, Date registerTime) {
+    public Maintainer(int id, String username, String password, String email, String token, String registerIp, String lastLoginIp, Date lastLoginTime, Date registerTime) {
         super(id, username, password, email, token, registerIp, lastLoginIp, lastLoginTime, registerTime);
     }
 
+    @Override
     public UserLevel getLevel() {
         return level;
+    }
+
+    @Override
+    public void setLevel(UserLevel level) {
+        this.level = level;
     }
 }

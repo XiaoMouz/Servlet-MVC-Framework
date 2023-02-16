@@ -231,7 +231,6 @@ class PostDispatcher extends AbstractDispatcher {
             } else if (parameterClass == HttpSession.class) {
                 arguments[i] = request.getSession();
             } else {
-                // todo: "fix exception - com.fasterxml.jackson.databind.exc.MismatchedInputException: No content to map due to end-of-input"
                 BufferedReader reader = request.getReader();
                 arguments[i] = this.objectMapper.readValue(reader, parameterClass);
             }
