@@ -40,7 +40,8 @@ public class DispatcherServlet extends HttpServlet {
     private ViewEngine viewEngine;
 
     /**
-     * 当Servlet容器创建当前Servlet实例后，会自动调用init(ServletConfig)方法
+     * init
+     * @throws ServletException
      */
     @Override
     public void init() throws ServletException {
@@ -205,7 +206,6 @@ class GetDispatcher extends AbstractDispatcher {
 }
 
 class PostDispatcher extends AbstractDispatcher {
-
     final Object instance;
     final Method method;
     final Class<?>[] parameterClasses;
