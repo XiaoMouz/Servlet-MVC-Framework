@@ -9,6 +9,7 @@ import java.util.Date;
 import com.jxcia202.jspdemo1.bean.User;
 import com.jxcia202.jspdemo1.bean.account.LoginBean;
 import com.jxcia202.jspdemo1.bean.account.RegisterBean;
+import com.jxcia202.jspdemo1.bean.account.ResetBean;
 import com.jxcia202.jspdemo1.bean.users.Administrator;
 import com.jxcia202.jspdemo1.bean.users.Editor;
 import com.jxcia202.jspdemo1.bean.users.Maintainer;
@@ -16,14 +17,13 @@ import com.jxcia202.jspdemo1.bean.users.Reader;
 import com.jxcia202.jspdemo1.framework.GetMapping;
 import com.jxcia202.jspdemo1.framework.ModelAndView;
 import com.jxcia202.jspdemo1.framework.PostMapping;
-import com.jxcia202.jspdemo1.jdbc.ConnectionFactory;
+import com.jxcia202.jspdemo1.util.ConnectionUtil;
 import com.jxcia202.jspdemo1.util.EncryptionUtil;
-import com.sun.tools.javac.Main;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 public class UserController {
-    Connection remote = ConnectionFactory.getConnection();
+    Connection remote = ConnectionUtil.getConnection();
     private  ArrayList<User> getDBUsers() throws SQLException {
         ArrayList<User> onlineUsers = new ArrayList<User>();
         PreparedStatement statement = remote.prepareStatement("select * from user");
@@ -71,7 +71,7 @@ public class UserController {
 
     @GetMapping("/login")
     public ModelAndView login() {
-        return new ModelAndView("/login.html");
+        return new ModelAndView("/user/login.html");
     }
 
     @PostMapping("/login")
@@ -100,7 +100,7 @@ public class UserController {
 
     @GetMapping("/register")
     public ModelAndView register(HttpSession session){
-        return new ModelAndView("/register.html");
+        return new ModelAndView("/user/register.html");
     }
 
     @PostMapping("/register")

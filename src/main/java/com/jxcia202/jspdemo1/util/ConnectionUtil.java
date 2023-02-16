@@ -1,11 +1,11 @@
-package com.jxcia202.jspdemo1.jdbc;
+package com.jxcia202.jspdemo1.util;
 
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
 
-public class ConnectionFactory {
+public class ConnectionUtil {
     private static String driver;
     private static String url;
     private static String user;
@@ -14,7 +14,7 @@ public class ConnectionFactory {
     static{
         try{
             Properties properties = new Properties();
-            InputStream input = ConnectionFactory.class.getClassLoader().getResourceAsStream("db.properties");
+            InputStream input = ConnectionUtil.class.getClassLoader().getResourceAsStream("db.properties");
             properties.load(input);
             driver = properties.getProperty("driver");
             url = properties.getProperty("url");
