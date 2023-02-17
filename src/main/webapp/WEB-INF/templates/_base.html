@@ -19,6 +19,9 @@
   {% endif%}
   {% if user != null %}
   <div class="nav-item dropdown">
+<!--    {% if user.getAvatarLink()!=null %}-->
+<!--    <img src="{{user.getAvatarLink()}}" class=".img-fluid. max-width: 100%;height: auto; rounded-circle" alt="avatar"/>-->
+<!--    {% endif %}-->
     <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
       {{ user.getUsername() }}
     </a>
