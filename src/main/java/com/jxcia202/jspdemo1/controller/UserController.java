@@ -6,11 +6,9 @@ import java.util.*;
 import java.util.Date;
 
 import com.jxcia202.jspdemo1.bean.User;
-import com.jxcia202.jspdemo1.bean.account.LoginBean;
-import com.jxcia202.jspdemo1.bean.account.RegisterBean;
-import com.jxcia202.jspdemo1.bean.account.ResetBean;
-import com.jxcia202.jspdemo1.bean.account.VerifyBean;
+import com.jxcia202.jspdemo1.bean.account.*;
 import com.jxcia202.jspdemo1.bean.users.Reader;
+import com.jxcia202.jspdemo1.bean.users.UserLevel;
 import com.jxcia202.jspdemo1.framework.GetMapping;
 import com.jxcia202.jspdemo1.framework.ModelAndView;
 import com.jxcia202.jspdemo1.framework.PostMapping;
@@ -63,6 +61,15 @@ public class UserController {
         statement.setString(1,user.getPassword());
         statement.setString(2,user.getUsername());
         statement.executeUpdate();
+    }
+
+    private void updateProfile(ProfileBean user) throws SQLException{
+        String sql = "update user set email = ?,password = ?, avatarLink =? where username = ?";
+        PreparedStatement statement = remote.prepareStatement(sql);
+        statement.setString(1,user.email);
+        statement.setString(2,user.password);
+        statement.setString(3,user.avatarLink);
+        statement.setString(4,user.username);
     }
 
     private ModelAndView resetSent(ResetBean bean, HttpServletResponse response, String trackID, User user) throws IOException {
@@ -215,12 +222,55 @@ public class UserController {
         }
     }
 
-    @GetMapping("/user/profile")
+    @GetMapping("/profile")
     public ModelAndView profile(HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return new ModelAndView("redirect:./login");
         }
         return new ModelAndView("user/profile.html", "user", user);
+    }
+
+    @PostMapping("/profile")
+    public ModelAndView profile(ProfileBean bean, HttpServletResponse response, HttpSession session) throws IOException {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            JsonUtil.responseJson(response, JsonType.ERROR, "Invalid request: Not Login");
+            return null;
+        }
+        if(user.getLevel()!= UserLevel.ADMINISTRATOR&&user.getUsername()    != bean.username){
+            JsonUtil.responseJson(response, JsonType.ERROR, "Invalid request: No access");
+            return null;
+        }
+        if(user.getUsername()!=bean.username){
+            User match = userDatabase.get(bean.username);
+            if(match==null){
+                JsonUtil.responseJson(response, JsonType.ERROR, "Invalid request: Unknown User");
+                return null;
+            }
+        }
+        if (bean.password == null) {
+            bean.password = user.getPassword();
+        }
+        if (bean.email == null) {
+            bean.email = user.getEmail();
+        }
+        if (bean.avatarLink == null){
+            bean.avatarLink = user.getAvatarLink();
+        }
+        try{
+            updateProfile(bean);
+            if(user.getUsername()!=bean.username)
+                user = userDatabase.get(bean.username);
+            user.setPassword(bean.password);
+            user.setEmail(bean.email);
+            user.setAvatarLink(bean.avatarLink);
+            userDatabase.replace(bean.username, user);
+            session.setAttribute("user", user);
+            JsonUtil.responseJson(response,JsonType.SUCCESS,"Update User profile");
+        } catch (SQLException e) {
+            logger.error(e.toString());
+        }
+        return null;
     }
 }

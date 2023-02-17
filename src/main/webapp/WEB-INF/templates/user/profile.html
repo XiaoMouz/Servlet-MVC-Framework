@@ -1,5 +1,91 @@
 {% extends "../_base.html" %}
 
 {% block main %}
-<h1>In progress~ </h1>
+<script>
+    $('#profile').change(function (){
+        document.getElementById("submitBtn").classList.remove("hide");
+    });
+    $(function (){
+        $('#profile').submit(function (e){
+            var newpwd = null;
+            if($('#newPassword').val()!=$('#cfpassword').val()){
+                $('#error').text('两次输入的密码不一致');
+                return;
+            }
+            if($('#newPassword').val()!=''){
+                newpwd = md5($('#newPassword').val());
+            }
+
+            var data={
+                email:$('#email').val(),
+                avatarLink:$('#avatar-link').val(),
+                newPassword: newpwd
+            };
+            $.ajax({
+                type: 'POST',
+                url: '#',
+                data: JSON.stringify(data),
+                success: function (resp) {
+                    if (resp.error) {
+                        $('#error').text(resp.error);
+                    } else {
+                        location.assign('./');
+                    }
+                },
+                contentType: 'application/json',
+                dataType: 'json'
+            })
+        })
+    })
+</script>
+<h1>Profile Edit</h1>
+<div class="container">
+    <div class="col-md-8">
+        <form id="profile">
+            <div class="form-group">
+                <p id="error" class="text-danger"></p>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input id="username" type="username" class="form-control" placeholder="Username"  value="{{user.getUsername()}}" disabled="disabled"/>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input id="email" type="email" class="form-control" placeholder="Email" value="{{user.getEmail()}}"/>
+            </div>
+            <div class="form-group">
+                <label>Avatar Link</label>
+                <input id="avatar-link" type="url" class="form-control" placeholder="Image URL"  value="{{user.getAvatarLink()}}"/>
+            </div>
+            <div class="form-group">
+                <label>New password</label>
+                <input id="newPassword" type="password" class="form-control" placeholder="Password"/>
+            </div>
+            <div class="form-group">
+                <label>Confirm new password</label>
+                <input id="cfpassword" type="password" class="form-control" placeholder="password"/>
+            </div>
+            <button id="submitBtn" type="submit" class="btn btn-outline-success hide">Save</button>
+        </form>
+    </div>
+    <div class="col-md-4">
+        {% if user.getAvatarLink()!=null %}
+        <img src="{{user.getAvatarLink()}}" class="img-thumbnail rounded-circle" alt="avatar"/>
+        {% endif %}
+        <ul class="list-group mt-2">
+            <ul class="list-group list-group-horizontal flex-fill">
+                <li class="list-group-item flex-fill">Register Time: {{user.getRegisterTime()}}</li>
+            </ul>
+            <ul class="list-group list-group-horizontal flex-fill">
+                <li class="list-group-item flex-fill">Last Login Time: {{user.getLastLoginTime()}}</li>
+            </ul>
+            <ul class="list-group list-group-horizontal flex-fill">
+                <li class="list-group-item flex-fill">Register IP: {{user.getRegisterIp()}}</li>
+            </ul>
+            <ul class="list-group list-group-horizontal flex-fill">
+                <li class="list-group-item flex-fill">Last Login IP: {{user.getLastLoginIp()}}</li>
+            </ul>
+        </ul>
+    </div>
+</div>
 {% endblock %}
