@@ -1,5 +1,9 @@
 {% extends "_base.html" %}
 
 {% block main %}
-        <h1>Welcome{% if user != null %}, {{user.getUsername()}}{% endif %}</h1>
+<div class="home-title">
+        <h1 class="site-title">Welcome{% if user != null %}, {{user.getUsername()}}{% endif %}</h1>
+        <p class="slogen"></p>
+</div>
+
 {% endblock %}
