@@ -1,5 +1,6 @@
 package com.jxcia202.jspdemo1.util;
 
+import com.jxcia202.jspdemo1.bean.SinglePost;
 import com.jxcia202.jspdemo1.bean.User;
 import com.jxcia202.jspdemo1.bean.users.Administrator;
 import com.jxcia202.jspdemo1.bean.users.Editor;
@@ -13,7 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SiteSetUtil {
+public class SiteUtil {
     public static ArrayList<User> getDBUsers() throws SQLException {
         Connection remote = ConnectionUtil.getConnection();
         ArrayList<User> onlineUsers = new ArrayList<User>();
@@ -40,5 +41,35 @@ public class SiteSetUtil {
             settingMap.put(resultSet.getString("name"),resultSet.getString("value"));
         }
         return settingMap;
+    }
+
+    public static HashMap<Integer, SinglePost> getAllPosts() throws SQLException{
+        Connection remote = ConnectionUtil.getConnection();
+        HashMap<Integer,SinglePost> posts = new HashMap<>();
+        PreparedStatement statement = remote.prepareStatement("select * from posts");
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()){
+            posts.put(resultSet.getInt("postid"),new SinglePost(
+                    resultSet.getInt("postid"),
+                    resultSet.getString("title"),
+                    resultSet.getString("content"),
+                    resultSet.getDate("releaseDate"),
+                    resultSet.getDate("updateDate"),
+                    resultSet.getInt("authorId"),
+                    resultSet.getString("authorname"),
+                    resultSet.getString("headImgLink")
+                    ));
+        }
+        return posts;
+    }
+
+    public static User findUser(String username) throws SQLException{
+        ArrayList<User> users = getDBUsers();
+        for(User user:users){
+            if(user.getUsername().equals(username)){
+                return user;
+            }
+        }
+        return null;
     }
 }

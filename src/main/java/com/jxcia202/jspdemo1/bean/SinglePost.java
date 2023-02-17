@@ -1,5 +1,7 @@
 package com.jxcia202.jspdemo1.bean;
 
+import com.jxcia202.jspdemo1.util.SiteUtil;
+
 import java.util.Date;
 
 public class SinglePost {
@@ -10,6 +12,22 @@ public class SinglePost {
     private Date updateDate;
     private User author;
     private String headImgLink;
+
+    public SinglePost(int postid, String title, String content, java.sql.Date releaseDate, java.sql.Date updateDate, int authorId, String authorname, String headImgLink) {
+        this.postid = postid;
+        this.title = title;
+        this.content = content;
+        this.releaseDate = releaseDate;
+        this.updateDate = updateDate;
+        try{
+            this.author = SiteUtil.findUser(authorname);
+        }catch (Exception e){
+            e.printStackTrace();
+            this.author = null;
+        }
+
+        this.headImgLink = headImgLink;
+    }
 
     public int getPostid() {
         return postid;
