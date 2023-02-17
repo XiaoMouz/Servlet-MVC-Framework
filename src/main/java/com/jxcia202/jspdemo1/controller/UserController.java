@@ -25,7 +25,7 @@ public class UserController {
     private Map<String, User> userDatabase = new HashMap<>() {
         {
             try{
-                SiteSetUtil.getDBUsers().forEach(user -> {put(user.getUsername(),user);});
+                SiteUtil.getDBUsers().forEach(user -> {put(user.getUsername(),user);});
             }catch (Exception e){
                 logger.error("Failed in 'UserController' class, the 'userDatabase' is null.");
             }
@@ -70,6 +70,7 @@ public class UserController {
         statement.setString(2,user.getPassword());
         statement.setString(3,user.getAvatarLink());
         statement.setString(4,user.getUsername());
+        statement.executeUpdate();
     }
 
     private ModelAndView resetSent(ResetBean bean, HttpServletResponse response, String trackID, User user) throws IOException {
