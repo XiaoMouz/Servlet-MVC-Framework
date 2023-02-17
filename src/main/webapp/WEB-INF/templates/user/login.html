@@ -9,6 +9,7 @@
                 $('#error').text('请填写完整信息');
                 return;
             };
+            $('#error').text('');
             var data = {
                 username: $('#username').val(),
                 password: md5($('#password').val())

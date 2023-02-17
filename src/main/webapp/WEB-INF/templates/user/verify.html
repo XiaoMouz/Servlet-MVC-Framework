@@ -17,6 +17,7 @@
                 $('#error').text('Password length should be 6-16');
                 return;
             };
+            $('#error').text('');
             var data = {
                 trackID: $('#code').val(),
                 password: md5($('#password').val())
