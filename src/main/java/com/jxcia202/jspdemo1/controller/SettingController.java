@@ -10,7 +10,7 @@ import com.jxcia202.jspdemo1.framework.PostMapping;
 import com.jxcia202.jspdemo1.util.ConnectionUtil;
 import com.jxcia202.jspdemo1.util.JsonUtil;
 import com.jxcia202.jspdemo1.util.JsonType;
-import com.jxcia202.jspdemo1.util.SiteSetUtil;
+import com.jxcia202.jspdemo1.util.SiteUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class SettingController {
     private HashMap<String, String> settings = new HashMap<String, String>() {
         {
             try {
-                HashMap<String, String> sets = SiteSetUtil.getSiteSetting();
+                HashMap<String, String> sets = SiteUtil.getSiteSetting();
                 sets.forEach((k, v) -> {
                     this.put(k, v);
                 });
@@ -43,7 +43,7 @@ public class SettingController {
     private Map<String, User> users = new HashMap<>() {
         {
             try{
-                SiteSetUtil.getDBUsers().forEach(user -> {put(user.getUsername(),user);});
+                SiteUtil.getDBUsers().forEach(user -> {put(user.getUsername(),user);});
             }catch (Exception e){
                 logger.error("Failed in 'SettingController' class, the 'users' is null.");
             }
