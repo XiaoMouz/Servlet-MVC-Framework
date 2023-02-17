@@ -3,16 +3,21 @@
 {% block main %}
 <h1>Site Setting</h1>
 <div class="row">
-    <div class="col-12 mt-4">
+    <div class="col-12 mt-2">
         <ul class="nav nav-pills">
             <li class="nav-item">
                 <a class="nav-link" href="./general">General</a>
             </li>
+            {% if (user.getLevel().toString() == "ADMINISTRATOR")%}
             <li class="nav-item">
                 <a class="nav-link" href="./users">Users manager</a>
             </li>
+            {% endif %}
             <li class="nav-item">
                 <a class="nav-link" href="./posts">Posts</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="./comment">Comments</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="./categories">Categories</a>
@@ -22,7 +27,7 @@
             </li>
         </ul>
     </div>
-    <div class="col-12">
+    <div class="col-12 mt-4">
         <div class="row">
             {% block content %}
             {% endblock %}
