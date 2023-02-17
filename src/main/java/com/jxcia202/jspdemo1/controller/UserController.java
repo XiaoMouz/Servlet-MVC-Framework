@@ -63,13 +63,13 @@ public class UserController {
         statement.executeUpdate();
     }
 
-    private void updateProfile(ProfileBean user) throws SQLException{
+    private void updateProfile(User user) throws SQLException{
         String sql = "update user set email = ?,password = ?, avatarLink =? where username = ?";
         PreparedStatement statement = remote.prepareStatement(sql);
-        statement.setString(1,user.email);
-        statement.setString(2,user.password);
-        statement.setString(3,user.avatarLink);
-        statement.setString(4,user.username);
+        statement.setString(1,user.getEmail());
+        statement.setString(2,user.getPassword());
+        statement.setString(3,user.getAvatarLink());
+        statement.setString(4,user.getUsername());
     }
 
     private ModelAndView resetSent(ResetBean bean, HttpServletResponse response, String trackID, User user) throws IOException {
@@ -233,6 +233,7 @@ public class UserController {
 
     @PostMapping("/profile")
     public ModelAndView profile(ProfileBean bean, HttpServletResponse response, HttpSession session) throws IOException {
+        logger.info(bean.toString());
         User user = (User) session.getAttribute("user");
         if (user == null) {
             JsonUtil.responseJson(response, JsonType.ERROR, "Invalid request: Not Login");
@@ -259,12 +260,12 @@ public class UserController {
             bean.avatarLink = user.getAvatarLink();
         }
         try{
-            updateProfile(bean);
             if(user.getUsername()!=bean.username)
                 user = userDatabase.get(bean.username);
             user.setPassword(bean.password);
             user.setEmail(bean.email);
             user.setAvatarLink(bean.avatarLink);
+            updateProfile(user);
             userDatabase.replace(bean.username, user);
             session.setAttribute("user", user);
             JsonUtil.responseJson(response,JsonType.SUCCESS,"Update User profile");

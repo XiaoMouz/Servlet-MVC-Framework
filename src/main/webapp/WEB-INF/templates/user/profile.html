@@ -17,6 +17,7 @@
             }
 
             var data={
+                username: $('#username').val(),
                 email:$('#email').val(),
                 avatarLink:$('#avatar-link').val(),
                 newPassword: newpwd
@@ -29,7 +30,7 @@
                     if (resp.error) {
                         $('#error').text(resp.error);
                     } else {
-                        location.assign('./');
+                        location.assign('#');
                     }
                 },
                 contentType: 'application/json',
@@ -39,7 +40,7 @@
     })
 </script>
 <h1>Profile Edit</h1>
-<div class="container">
+<div class="row">
     <div class="col-md-8">
         <form id="profile">
             <div class="form-group">

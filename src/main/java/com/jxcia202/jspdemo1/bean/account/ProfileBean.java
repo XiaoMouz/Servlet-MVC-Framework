@@ -6,4 +6,15 @@ public class ProfileBean {
     public String password;
     public String newPassword;
     public String avatarLink;
+
+    @Override
+    public String toString() {
+        return "UserBean{" +
+                "username='" + username + '\'' +
+                ", email=" + email +
+                ", password='" + password + '\'' +
+                ", newPassword='" + newPassword + '\'' +
+                ", avatarLink='" + avatarLink + '\'' +
+                '}';
+    }
 }
