@@ -14,6 +14,7 @@ target/
 .idea/dataSources
 .idea/dataSources.local.xml
 .idea/dataSources/
+/.idea/webContexts.xml
 *.iws
 *.iml
 *.ipr
