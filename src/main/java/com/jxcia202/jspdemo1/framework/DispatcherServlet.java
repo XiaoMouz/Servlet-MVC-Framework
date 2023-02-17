@@ -35,7 +35,9 @@ public class DispatcherServlet extends HttpServlet {
 
     private Map<String, PostDispatcher> postMappings = new HashMap<>();
 
-    private List<Class<?>> controllers = List.of(IndexController.class, UserController.class, SettingController.class);
+    private List<Class<?>> controllers = List.of(IndexController.class,
+            UserController.class,
+            SettingController.class);
 
     private ViewEngine viewEngine;
 

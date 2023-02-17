@@ -77,7 +77,7 @@ public class SettingController {
         if(session.getAttribute("user") == null)
             return new ModelAndView("redirect:./login");
         session.setAttribute("settings",settings);
-        return new ModelAndView("/settings/general.html");
+        return new ModelAndView("/settings/general.html","user",session.getAttribute("user"));
     }
 
     @PostMapping("/general")
@@ -110,6 +110,7 @@ public class SettingController {
             {
                 put("userLists",userLists);
                 put("users",users);
+                put("user",session.getAttribute("user"));
             }
         });
     }
