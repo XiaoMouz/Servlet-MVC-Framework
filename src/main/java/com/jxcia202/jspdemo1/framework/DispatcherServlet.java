@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jxcia202.jspdemo1.controller.IndexController;
 import com.jxcia202.jspdemo1.controller.UserController;
 
-@WebServlet(urlPatterns = "/")
+@WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

@@ -15,6 +15,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <junit.version>5.9.0</junit.version>
+        <tomcat.version>10.1.1</tomcat.version>
     </properties>
 
     <dependencies>
@@ -42,7 +43,7 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.31</version>
         </dependency>
-        <!-- 使用 Pebblet 渲染引擎 -->
+        <!-- 使用 Pebble 渲染引擎 -->
         <dependency>
             <groupId>io.pebbletemplates</groupId>
             <artifactId>pebble</artifactId>
@@ -88,6 +89,19 @@
             <version>2.0.1</version>
         </dependency>
 
+        <!-- Tomcat -->
+        <dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>provided</scope>
+		</dependency>
     </dependencies>
 
     <build>

@@ -26,7 +26,7 @@ public class EncryptionUtil {
         if(bigInteger != null) {
             return bigInteger.toString(16);
         } else {
-            System.out.println("Faild in 'EncryptionUtil.getMD5Result()' method, the convert value is null.");
+            System.out.println("Failed in 'EncryptionUtil.getMD5Result()' method, the convert value is null.");
             return null;
         }
     }

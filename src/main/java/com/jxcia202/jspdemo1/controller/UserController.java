@@ -27,13 +27,13 @@ public class UserController {
             try{
                 SiteUtil.getDBUsers().forEach(user -> {put(user.getUsername(),user);});
             }catch (Exception e){
-                logger.error("Failed in 'UserController' class, the 'userDatabase' is null.");
+                logger.error("Failed in 'UserController' class, the 'userDatabase' is null."+e.getMessage());
             }
         }
     };
     private ResetBean resetBean = null;
 
-    private boolean insertNewUser(User user) throws SQLException{
+        private boolean insertNewUser(User user) throws SQLException{
         String sql = "insert into user(username,password,email,token,registerIp,lastLoginIp,lastLoginTime,registerTime) values(?,?,?,?,?,?,?,?)";
         PreparedStatement statement = remote.prepareStatement(sql);
         statement.setString(1,user.getUsername());
@@ -89,25 +89,40 @@ public class UserController {
 
     @PostMapping("/login")
     public ModelAndView login(LoginBean bean, HttpServletResponse response, HttpSession session, HttpServletRequest request) throws IOException {
+
         User user = userDatabase.get(bean.username);
-        if (user == null || !user.getPassword().equals(bean.password)) {
-            JsonUtil.responseJson(response, JsonType.ERROR, "Username or password is incorrect");
-            return null;
+        try {
+            if (user == null) {
+                user = SiteUtil.findUser(bean.username);
+                if (user != null) {
+                    userDatabase.put(user.getUsername(), user);
+                    user.setLastLoginIp(request.getRemoteAddr());
+                    user.setLastLoginTime(new Date());
+                    updateUserLoginTimeAndIp(user);
+                    logger.info(user.getUsername() + ":update ip success");
+                }
+            }
+        } catch (Exception e) {
+            if(user != null)
+                logger.error(user.getUsername() + "update ip failed");
+
+            logger.error("Failed in 'UserController' class, the 'login' method."+e.getMessage());
         }
-        session.setAttribute("user", user);
-        user.setLastLoginIp(request.getRemoteAddr());
-        user.setLastLoginTime(new Date());
-        try{
-            updateUserLoginTimeAndIp(user);
-        }catch (Exception e){
-            logger.error(user.getUsername()+"update ip failed");
+        finally {
+            if (user == null || !user.getPassword().equals(bean.password)) {
+                JsonUtil.responseJson(response, JsonType.ERROR, "Username or password is incorrect");
+            }
+            else {
+                session.setAttribute("user", user);
+                JsonUtil.responseJson(response, JsonType.SUCCESS, "Login success");
+            }
         }
-        JsonUtil.responseJson(response, JsonType.SUCCESS, "Login success");
         return null;
     }
 
     @GetMapping("/logout")
     public ModelAndView logout(HttpSession session) {
+        userDatabase.remove(((User) session.getAttribute("user")).getUsername());
         session.removeAttribute("user");
         return new ModelAndView("redirect:./");
     }
@@ -150,7 +165,8 @@ public class UserController {
                 JsonUtil.responseJson(response, JsonType.SUCCESS, "Register success");
             }
         } catch (SQLException e) {
-            JsonUtil.responseJson(response, JsonType.ERROR, "Register failed, Server have problem");
+            logger.error(e.getErrorCode()+":"+e.getMessage());
+            JsonUtil.responseJson(response, JsonType.ERROR, "Register failed, Server have problem:"+e.getMessage());
         }
         return null;
     }
@@ -240,7 +256,7 @@ public class UserController {
             JsonUtil.responseJson(response, JsonType.ERROR, "Invalid request: Not Login");
             return null;
         }
-        if(user.getLevel()!= UserLevel.ADMINISTRATOR&&user.getUsername()    != bean.username){
+        if(user.getLevel()!= UserLevel.ADMINISTRATOR&&user.getUsername()!= bean.username){
             JsonUtil.responseJson(response, JsonType.ERROR, "Invalid request: No access");
             return null;
         }

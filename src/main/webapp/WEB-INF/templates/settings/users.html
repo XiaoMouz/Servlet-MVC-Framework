@@ -40,7 +40,7 @@
                             <td>{{i}}</td>
                             <td>{{users[i].getEmail()}}</td>
                             <td>
-                                <select class="level-{{i}}">
+                                <select class="col-md-8 form-control level-{{i}}">
                                     <option {% if (users[i].getLevel().toString() == "ADMINISTRATOR") %} selected {% endif %}>ADMINISTRATOR</option>
                                     <option {% if (users[i].getLevel().toString() == "EDITOR") %} selected {% endif %}>EDITOR</option>
                                     <option {% if (users[i].getLevel().toString() == "MAINTATINER") %} selected {% endif %}>MAINTAINER</option>

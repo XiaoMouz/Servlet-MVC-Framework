@@ -17,7 +17,8 @@ import java.util.HashMap;
 public class SiteUtil {
     public static ArrayList<User> getDBUsers() throws SQLException {
         Connection remote = ConnectionUtil.getConnection();
-        ArrayList<User> onlineUsers = new ArrayList<User>();
+        ArrayList<User> onlineUsers = new ArrayList<>();
+        assert remote != null;
         PreparedStatement statement = remote.prepareStatement("select * from user");
         ResultSet resultSet = statement.executeQuery();
         while(resultSet.next()){
@@ -25,8 +26,7 @@ public class SiteUtil {
                 case "ADMINISTRATOR": onlineUsers.add(new Administrator(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
                 case "EDITOR": onlineUsers.add(new Editor(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
                 case "MAINTAINER": onlineUsers.add(new Maintainer(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
-                case "READER": onlineUsers.add(new Reader(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
-                default: break;
+                default: onlineUsers.add(new Reader(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime")));break;
             }
         }
         return onlineUsers;
@@ -63,13 +63,27 @@ public class SiteUtil {
         return posts;
     }
 
-    public static User findUser(String username) throws SQLException{
-        ArrayList<User> users = getDBUsers();
-        for(User user:users){
-            if(user.getUsername().equals(username)){
-                return user;
+    public static User findUser(String username){
+        try {
+            Connection remote = ConnectionUtil.getConnection();
+            assert remote != null;
+            PreparedStatement statement = remote.prepareStatement("select * from user where username = ?");
+            statement.setString(1,username);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                switch(resultSet.getString("userlevel")){
+                    case "ADMINISTRATOR": return new Administrator(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime"));
+                    case "EDITOR": return new Editor(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime"));
+                    case "MAINTAINER": return new Maintainer(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime"));
+                    case "READER": return new Reader(resultSet.getInt("id"),resultSet.getString("username"),resultSet.getString("password"),resultSet.getString("email"),resultSet.getString("token"),resultSet.getString("registerIp"),resultSet.getString("lastLoginIp"),resultSet.getDate("lastLoginTime"),resultSet.getDate("registerTime"));
+                    default: return null;
+                }
+            }else{
+                return null;
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 }

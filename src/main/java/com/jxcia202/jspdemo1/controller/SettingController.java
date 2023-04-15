@@ -32,9 +32,7 @@ public class SettingController {
         {
             try {
                 HashMap<String, String> sets = SiteUtil.getSiteSetting();
-                sets.forEach((k, v) -> {
-                    this.put(k, v);
-                });
+                this.putAll(sets);
             } catch (SQLException e) {
                 logger.error("Failed in 'SettingController' class, the 'settingMap' is null.");
             }
@@ -43,7 +41,10 @@ public class SettingController {
     private Map<String, User> users = new HashMap<>() {
         {
             try{
-                SiteUtil.getDBUsers().forEach(user -> {put(user.getUsername(),user);});
+                SiteUtil.getDBUsers().forEach(user -> {
+
+                    logger.info(user.getUsername());
+                    put(user.getUsername(),user);});
             }catch (Exception e){
                 logger.error("Failed in 'SettingController' class, the 'users' is null.");
             }
