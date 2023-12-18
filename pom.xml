@@ -75,7 +75,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.12</version>
         </dependency>
         <!-- Jakarta Email 接口与实现 -->
         <dependency>
